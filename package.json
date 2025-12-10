@@ -1,0 +1,54 @@
+{
+  "name": "htemail-extension",
+  "version": "0.0.1",
+  "description": "**HTEMAIL** is a fully open-source Chrome extension that injects a visual HTML email builder directly into Gmail, Outlook Web, and other major email providers. It empowers users to create responsive, production-ready HTML email templates without leaving their inbox.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pepefeliblu/htemail-extension.git"
+  },
+  "keywords": [
+    "chrome-extension",
+    "email-builder",
+    "html-email",
+    "gmail-extension",
+    "outlook-extension"
+  ],
+  "author": "Juan Jose Rueda",
+  "license": "MIT",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/pepefeliblu/htemail-extension/issues"
+  },
+  "homepage": "https://github.com/pepefeliblu/htemail-extension#readme",
+  "dependencies": {
+    "@milkdown/core": "^7.17.3",
+    "@milkdown/ctx": "^7.17.3",
+    "@milkdown/plugin-clipboard": "^7.17.3",
+    "@milkdown/plugin-history": "^7.17.3",
+    "@milkdown/plugin-listener": "^7.17.3",
+    "@milkdown/preset-commonmark": "^7.17.3",
+    "@milkdown/theme-nord": "^7.17.3",
+    "autoprefixer": "^10.4.22",
+    "postcss": "^8.5.6",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
+    "tailwindcss": "^4.1.17"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.17",
+    "@types/chrome": "^0.1.32",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.2",
+    "css-loader": "^7.1.2",
+    "style-loader": "^4.0.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.7"
+  }
+}
