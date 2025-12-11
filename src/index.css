@@ -1,3 +1,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Milkdown Overrides for Email-like appearance */
+.milkdown .editor {
+    padding: 2rem !important;
+    padding-left: 8rem !important;
+    /* Extra left padding for drag handles/menus */
+    outline: none !important;
+    min-height: 400px;
+    /* Reduced min-height to avoid forcing scroll on small windows unnecessarily */
+    padding-bottom: 200px !important;
+    /* Extra space at bottom */
+}
+
+.milkdown {
+    height: 100%;
+}
+
+/* Ensure toolbars are visible */
+.milkdown-crepe {
+    z-index: 1000;
+}

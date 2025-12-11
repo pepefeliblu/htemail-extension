@@ -28,11 +28,13 @@
   "homepage": "https://github.com/pepefeliblu/htemail-extension#readme",
   "dependencies": {
     "@milkdown/core": "^7.17.3",
+    "@milkdown/crepe": "^7.17.3",
     "@milkdown/ctx": "^7.17.3",
     "@milkdown/plugin-clipboard": "^7.17.3",
     "@milkdown/plugin-history": "^7.17.3",
     "@milkdown/plugin-listener": "^7.17.3",
     "@milkdown/preset-commonmark": "^7.17.3",
+    "@milkdown/react": "^7.17.3",
     "@milkdown/theme-nord": "^7.17.3",
     "autoprefixer": "^10.4.22",
     "postcss": "^8.5.6",
