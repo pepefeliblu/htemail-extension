@@ -5,10 +5,12 @@
 ## 🚀 Features
 
 - **Visual Email Editor**: Powered by [Milkdown](https://milkdown.dev/), a WYSIWYG editor with custom blocks for email structures.
-- **In-Inbox Injection**: Works directly inside Gmail, Outlook, Yahoo, and ProtonMail.
-- **Responsive HTML Export**: Generates table-based HTML with inline CSS for maximum client compatibility.
+- **Floating Integration**: Unobtrusive floating button in Gmail, seamlessly integrating without mimicking native UI.
+- **Smart Visibility**: Editor controls only appear when you need them, keeping your workspace clean.
+- **Responsive HTML Export**: Generates table-based HTML with inline CSS.
+- **Copy & Insert**: Insert directly into the compose window or copy the HTML to your clipboard.
 - **Template Management**: Save, load, and manage your email templates locally.
-- **Smart CSS Inliner**: Automatically converts styles to inline CSS, handling tricky email client quirks.
+- **Smart CSS Inliner**: Automatically converts styles to inline CSS.
 
 ## 🛠 Tech Stack
 

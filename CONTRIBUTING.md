@@ -27,6 +27,7 @@ We welcome contributions to the HTEMAIL project! Here are some guidelines to hel
 
 -   **TypeScript**: We use strict TypeScript. Avoid `any` where possible.
 -   **Components**: Functional React components with Hooks.
+-   **Content Scripts**: We prefer **floating UI elements** overlaid on the native interface rather than injecting directly into complex native DOM structures (like toolbars) to avoid breakage.
 -   **Styling**: utility-first with TailwindCSS.
 -   **Commits**: Please use [Conventional Commits](https://www.conventionalcommits.org/) (e.g., `feat: add spacer block`, `fix: gmail injection selector`).
 

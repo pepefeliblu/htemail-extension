@@ -46,28 +46,22 @@ The editor is powered by **Milkdown**, enhanced with a custom block system, and 
 ### 2.2 Email Client Injection
 - Detects the compose area in:
     - **Gmail Web**
-    - **Outlook Web**
-    - **Yahoo Mail**
-    - **ProtonMail**
-- Adds an **HTEMAIL** button to the native compose toolbar.
-- Opens a modal/overlay with the full editor.
-- On export:
-    - Converts project → HTML.
-    - Inserts the final HTML into the compose draft automatically.
+    - **Outlook Web** (Planned)
+    - **Yahoo Mail** (Planned)
+- Adds a **Floating HTEMAIL Trigger** to the bottom-right of the compose window.
+- Opens an overlay with the full editor.
+- **Smart Control Visibility**: "Insert" and "Copy" buttons remain hidden until content is added.
 
 ### 2.3 HTML Export
-- One-click export.
+- One-click export options.
 - Output:
     - Table-based layout
     - Inline CSS for compatibility
     - Responsive fallback for mobile
     - Base font stack
-    - Safe `<img>` attributes (`width`, `alt`, `style`)
-    - Outlook conditional comments (optional)
 - Export modes:
-    - Insert into email draft
-    - Copy to clipboard
-    - Download `.html` file
+    - **Insert**: Inject directly into the email body.
+    - **Copy**: Copy raw HTML to clipboard.
 
 ### 2.4 Templates
 - Saved to browser storage (IndexedDB or localStorage).

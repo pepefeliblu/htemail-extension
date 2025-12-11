@@ -7,7 +7,12 @@ To democratize high-quality HTML email creation by bringing a professional build
 HTEMAIL aims to be the standard open-source solution for in-browser email authoring. We value:
 -   **Privacy**: No external servers for data processing.
 -   **Compatibility**: Output that works on 99% of email clients.
--   **User Experience**: Seamless integration that feels native.
+- [x] **Core Editor**: Milkdown integration with basic formatting.
+- [x] **Gmail Injection**: Basic detection of compose window.
+- [x] **Floating UI**: Non-intrusive floating trigger and control buttons.
+- [x] **Smart Visibility**: UI elements that respect the user's workflow.
+- [x] **HTML Export**: Convert markdown to table-based HTML.
+- [x] **Copy & Insert**: Flexible export options.
 
 ## Roadmap (3-6 Months)
 
