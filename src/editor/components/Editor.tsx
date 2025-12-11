@@ -29,6 +29,17 @@ const Editor = () => {
         return crepe;
     });
 
+    // Listen for Export Request from Parent (Injector)
+    React.useEffect(() => {
+        const handleMessage = (event: MessageEvent) => {
+            if (event.data.type === 'HTEMAIL_EXPORT_REQUEST') {
+                handleExport();
+            }
+        };
+        window.addEventListener('message', handleMessage);
+        return () => window.removeEventListener('message', handleMessage);
+    }, [crepeInstance]);
+
     const handleExport = () => {
         if (!crepeInstance) return;
 
@@ -38,9 +49,6 @@ const Editor = () => {
             const rawHtml = editorElement.innerHTML;
             const cleanedHtml = cleanAndInlineHtml(rawHtml);
 
-            // For insertion context, we only want the safely styled fragment, 
-            // NOT the full HTML/Head/Body tags which would contain global styles breaking Gmail.
-            // We wrap it in a div to center it, similar to the boilerplate body.
             const fragment = `
                 <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #374151;">
                     ${cleanedHtml}
@@ -95,9 +103,6 @@ const Editor = () => {
             const tagName = el.tagName.toLowerCase();
             if (styles[tagName as keyof typeof styles]) {
                 const newStyle = styles[tagName as keyof typeof styles];
-                // Append current style if any (though usually we want to override or merge)
-                // For simplicity, we prepend our defaults so specific overrides might stay if we smarter,
-                // but here we just append to ensure our base look.
                 el.setAttribute('style', newStyle + (el.getAttribute('style') || ''));
             }
 
@@ -111,11 +116,8 @@ const Editor = () => {
 
             // Specific Fixes
             if (tagName === 'li') {
-                // Remove custom bullet wrapper
                 const labelWrapper = el.querySelector('.label-wrapper');
                 if (labelWrapper) labelWrapper.remove();
-
-                // Flatten contentDOM
                 const contentDom = el.querySelector('.content-dom');
                 if (contentDom) {
                     while (contentDom.firstChild) {
@@ -125,7 +127,6 @@ const Editor = () => {
                     if (childrenWrapper) childrenWrapper.remove();
                 }
             }
-
             // Remove empty Ps
             if (tagName === 'p' && el.textContent?.trim() === '' && el.children.length === 0) {
                 el.remove();
@@ -214,28 +215,7 @@ const Editor = () => {
                     <Milkdown />
                 </div>
             </div>
-
-            {/* Sticky Footer for Actions */}
-            <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 flex justify-end gap-2 z-50">
-                <button
-                    onClick={handleExport}
-                    style={{
-                        backgroundColor: '#2563eb', // blue-600
-                        color: 'white',
-                        fontWeight: 500,
-                        padding: '0.5rem 1rem',
-                        borderRadius: '0.375rem',
-                        border: 'none',
-                        cursor: 'pointer',
-                        boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-                        transition: 'background-color 0.15s ease-in-out',
-                    }}
-                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#1d4ed8'} // blue-700
-                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#2563eb'}
-                >
-                    Insert into Email
-                </button>
-            </div>
+            {/* Control is now handled by Parent via Messaging (Injector Overlay). */}
         </div>
     );
 };
