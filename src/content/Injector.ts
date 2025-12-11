@@ -7,21 +7,26 @@ export class Injector {
         this.detector = new Detector();
     }
 
+    private currentTarget: HTMLElement | null = null;
+    private currentWrapper: HTMLElement | null = null;
+    private currentTriggerBtn: HTMLElement | null = null;
+    private currentInsertBtn: HTMLElement | null = null;
+    private currentCopyBtn: HTMLElement | null = null;
+
     public init() {
         this.detector.start(this.handleComposeDetected.bind(this));
 
         window.addEventListener('message', (event) => {
-            if (event.data.type === 'HTEMAIL_INSERT') {
-                this.handleInsertRequest(event.data.html);
+            if (event.data.type === 'HTEMAIL_INSERT' || event.data.type === 'HTEMAIL_EXPORT_SUCCESS') {
+                this.handleExportSuccess(event.data.html, event.data.action || 'insert');
+            }
+            if (event.data.type === 'HTEMAIL_CONTENT_STATUS') {
+                this.handleContentStatus(event.data.hasContent);
             }
         });
 
         console.log('HTEMAIL: Detector started');
     }
-
-    private currentTarget: HTMLElement | null = null;
-    private currentWrapper: HTMLElement | null = null;
-    private currentTriggerBtn: HTMLElement | null = null;
 
     private handleComposeDetected(editableInfo: HTMLElement) {
         // If we have already injected for this element, skip
@@ -122,13 +127,43 @@ export class Injector {
         return btn;
     }
 
-    private handleInsertRequest(html: string) {
-        console.log('HTEMAIL: Inserting HTML');
-        if (this.currentTarget && this.currentWrapper) {
-            this.currentTarget.style.display = 'block';
-            this.currentTarget.innerHTML = html;
-            this.currentTarget.dispatchEvent(new Event('input', { bubbles: true }));
-            this.closeEditor();
+    private handleContentStatus(hasContent: boolean) {
+        // Toggle visibility based on content
+        const display = hasContent ? 'flex' : 'none';
+        if (this.currentInsertBtn) this.currentInsertBtn.style.display = display;
+        if (this.currentCopyBtn) this.currentCopyBtn.style.display = display;
+    }
+
+    private handleExportSuccess(html: string, action: 'insert' | 'copy') {
+        if (action === 'insert') {
+            console.log('HTEMAIL: Inserting HTML');
+            if (this.currentTarget && this.currentWrapper) {
+                this.currentTarget.style.display = 'block';
+                this.currentTarget.innerHTML = html;
+                this.currentTarget.dispatchEvent(new Event('input', { bubbles: true }));
+                this.closeEditor();
+            }
+        } else if (action === 'copy') {
+            console.log('HTEMAIL: Copying HTML');
+            navigator.clipboard.writeText(html).then(() => {
+                if (this.currentCopyBtn) {
+                    const originalContent = this.currentCopyBtn.innerHTML;
+                    this.currentCopyBtn.innerHTML = '<span style="font-size: 18px;">✅</span> Copied!';
+                    this.currentCopyBtn.style.backgroundColor = '#dcfce7'; // green-100
+                    this.currentCopyBtn.style.color = '#166534'; // green-800
+
+                    setTimeout(() => {
+                        if (this.currentCopyBtn) {
+                            this.currentCopyBtn.innerHTML = '<span style="font-size: 18px;">📋</span> Copy HTML';
+                            this.currentCopyBtn.style.backgroundColor = '#ffffff';
+                            this.currentCopyBtn.style.color = '#374151';
+                        }
+                    }, 2000);
+                }
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert('Failed to copy to clipboard');
+            });
         }
     }
 
@@ -228,15 +263,15 @@ export class Injector {
             this.closeEditor();
         };
 
-        // 5. Floating Insert Button (External Overlay)
+        // 5. Floating Insert Button (External Overlay - Initially Hidden)
         const insertBtn = document.createElement('div');
         insertBtn.innerHTML = '<span style="font-size: 18px;">🚀</span> Insert into Email';
         insertBtn.style.cssText = `
             position: absolute;
-            bottom: 110px;
+            bottom: 120px;
             right: 24px;
             z-index: 100;
-            display: flex;
+            display: none; /* Initially hidden */
             align-items: center;
             gap: 8px;
             background-color: #2563eb;
@@ -252,6 +287,33 @@ export class Injector {
             opacity: 0.95;
         `;
 
+        // 6. Floating Copy Button (Stacked ABOVE Insert - Initially Hidden)
+        const copyBtn = document.createElement('div');
+        copyBtn.id = 'htemail-copy-btn';
+        copyBtn.innerHTML = '<span style="font-size: 18px;">📋</span> Copy HTML';
+        copyBtn.style.cssText = `
+            position: absolute;
+            bottom: 180px; /* Stacked above Insert (120 + 40 + 20 gap) */
+            right: 24px;
+            z-index: 100;
+            display: none; /* Initially hidden */
+            align-items: center;
+            gap: 8px;
+            background-color: #ffffff;
+            color: #374151;
+            font-weight: 600;
+            font-size: 14px;
+            padding: 12px 20px;
+            border-radius: 9999px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.2s ease;
+            font-family: system-ui, -apple-system, sans-serif;
+            border: 1px solid #e5e7eb;
+            opacity: 0.95;
+        `;
+
+        // Hover effects for Insert
         insertBtn.addEventListener('mouseenter', () => {
             insertBtn.style.transform = 'translateY(-2px)';
             insertBtn.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
@@ -266,10 +328,40 @@ export class Injector {
             insertBtn.style.opacity = '0.95';
         });
 
+        // Hover effects for Copy
+        copyBtn.addEventListener('mouseenter', () => {
+            copyBtn.style.transform = 'translateY(-2px)';
+            copyBtn.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
+            copyBtn.style.backgroundColor = '#f9fafb';
+            copyBtn.style.opacity = '1';
+        });
+
+        copyBtn.addEventListener('mouseleave', () => {
+            copyBtn.style.transform = 'translateY(0)';
+            copyBtn.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+            copyBtn.style.backgroundColor = '#ffffff';
+            copyBtn.style.opacity = '0.95';
+        });
+
         insertBtn.onclick = () => {
-            iframe.contentWindow?.postMessage({ type: 'HTEMAIL_EXPORT_REQUEST' }, '*');
+            iframe.contentWindow?.postMessage({ type: 'HTEMAIL_EXPORT_REQUEST', action: 'insert' }, '*');
         };
 
+        copyBtn.onclick = () => {
+            // Reset text first
+            const originalText = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<span style="font-size: 18px;">⏳</span> Generating...';
+            iframe.contentWindow?.postMessage({ type: 'HTEMAIL_EXPORT_REQUEST', action: 'copy' }, '*');
+        };
+
+        // Listen for Content Status to toggle visibility
+        // We attach this to the window listener in init(), but we can also manage local state or specific handlers if needed.
+        // For simplicity, let's keep references here if we want to toggle them directly from the main listener,
+        // OR better: store them on the class instance to access them from handleContentStatus.
+        this.currentInsertBtn = insertBtn;
+        this.currentCopyBtn = copyBtn;
+
+        wrapper.appendChild(copyBtn);
         wrapper.appendChild(insertBtn);
         wrapper.appendChild(closeBtn);
         wrapper.appendChild(iframe);
@@ -278,33 +370,5 @@ export class Injector {
         if (target.parentNode) {
             target.parentNode.insertBefore(wrapper, target.nextSibling);
         }
-    }
-
-    private renderNativeControls(container: HTMLElement, target: HTMLElement) {
-        container.innerHTML = '';
-        const toggleBtn = this.createButton('Email Editor', '✏️');
-        // Capture 'target' correctly in closure
-        toggleBtn.onclick = () => {
-            this.replaceEditor(target, container);
-        };
-        container.appendChild(toggleBtn);
-    }
-
-    private renderEditorControls(container: HTMLElement, target: HTMLElement) {
-        container.innerHTML = '';
-
-        const insertBtn = this.createButton('Insert', '🚀');
-        insertBtn.style.background = '#2563EB';
-        insertBtn.style.color = 'white';
-        insertBtn.onclick = () => {
-            const iframe = document.getElementById('htemail-iframe') as HTMLIFrameElement;
-            iframe?.contentWindow?.postMessage({ type: 'HTEMAIL_EXPORT_REQUEST' }, '*');
-        };
-
-        const closeBtn = this.createButton('Close', '✕');
-        closeBtn.onclick = () => this.closeEditor(); // closeEditor handles state reset
-
-        container.appendChild(insertBtn);
-        container.appendChild(closeBtn);
     }
 }

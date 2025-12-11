@@ -14,14 +14,17 @@ const Editor = () => {
             defaultValue: localStorage.getItem('htemail_draft') || '# Welcome to HTEMAIL\nStart typing...',
         });
 
-        // Configure Listener for Auto-Save
+        // Configure Listener for Auto-Save and Content Monitoring
         crepe.editor.config((ctx) => {
             ctx.get(listenerCtx).mounted((ctx) => {
                 console.log('HTEMAIL: Editor Mounted');
+                // Initial check
+                checkContentStatus(crepe);
             });
             ctx.get(listenerCtx).updated((ctx, doc, prevDoc) => {
                 const markdown = crepe.getMarkdown();
                 localStorage.setItem('htemail_draft', markdown);
+                checkContentStatus(crepe);
             });
         }).use(listener);
 
@@ -29,18 +32,24 @@ const Editor = () => {
         return crepe;
     });
 
+    const checkContentStatus = (crepe: Crepe) => {
+        const markdown = crepe.getMarkdown();
+        const hasContent = markdown.trim().length > 0 && markdown.trim() !== '# Welcome to HTEMAIL\nStart typing...';
+        window.parent.postMessage({ type: 'HTEMAIL_CONTENT_STATUS', hasContent }, '*');
+    };
+
     // Listen for Export Request from Parent (Injector)
     React.useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
             if (event.data.type === 'HTEMAIL_EXPORT_REQUEST') {
-                handleExport();
+                handleExport(event.data.action);
             }
         };
         window.addEventListener('message', handleMessage);
         return () => window.removeEventListener('message', handleMessage);
     }, [crepeInstance]);
 
-    const handleExport = () => {
+    const handleExport = (action: 'insert' | 'copy' = 'insert') => {
         if (!crepeInstance) return;
 
         // WYSIWYG HTML Capture
@@ -55,8 +64,8 @@ const Editor = () => {
                 </div>
             `;
 
-            // Send to parent
-            window.parent.postMessage({ type: 'HTEMAIL_INSERT', html: fragment }, '*');
+            // Send to parent with action context
+            window.parent.postMessage({ type: 'HTEMAIL_EXPORT_SUCCESS', html: fragment, action }, '*');
         }
     };
 
