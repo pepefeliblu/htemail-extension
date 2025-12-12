@@ -76,7 +76,8 @@ export class Injector {
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             border: 1px solid #e5e7eb;
             font-family: system-ui, -apple-system, sans-serif;
-            transition: all 0.2s ease;
+            font-family: system-ui, -apple-system, sans-serif;
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s;
             opacity: 0.9;
         `;
 
@@ -106,6 +107,23 @@ export class Injector {
         btn.onclick = () => {
             this.replaceEditor(target, btn, sessionId);
         };
+
+        // Monitor Container Size for Trigger Visibility (Minimization Handling) - Uses ResizeObserver
+        if (container) {
+            const triggerObserver = new ResizeObserver((entries) => {
+                for (const entry of entries) {
+                    if (!btn.isConnected) {
+                        triggerObserver.disconnect();
+                        return;
+                    }
+                    const height = entry.contentRect.height;
+                    // Lower threshold to 60px to trigger "Show" faster (minimized is ~40px)
+                    const isMinimized = height < 60;
+                    btn.style.visibility = isMinimized ? 'hidden' : 'visible';
+                }
+            });
+            triggerObserver.observe(container);
+        }
     }
 
     private createButton(text: string, icon: string) {
@@ -123,7 +141,7 @@ export class Injector {
             cursor: pointer;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             font-weight: 500;
-            transition: all 0.2s;
+            transition: background 0.2s;
             user-select: none;
         `;
         btn.addEventListener('mouseenter', () => btn.style.background = 'rgba(0,0,0,0.1)');
@@ -296,7 +314,8 @@ export class Injector {
             border-radius: 9999px;
             cursor: pointer;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s, opacity 0.2s;
             font-family: system-ui, -apple-system, sans-serif;
             opacity: 0.95;
         `;
@@ -321,7 +340,8 @@ export class Injector {
             border-radius: 9999px;
             cursor: pointer;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s, opacity 0.2s;
             font-family: system-ui, -apple-system, sans-serif;
             border: 1px solid #e5e7eb;
             opacity: 0.95;
@@ -399,6 +419,33 @@ export class Injector {
         // 5. Insert where the target was
         if (target.parentNode) {
             target.parentNode.insertBefore(wrapper, target.nextSibling);
+        }
+
+        // 6. Monitor Visibility (ResizeObserver Minimization Handling)
+        if (container) {
+            const resizeObserver = new ResizeObserver((entries) => {
+                for (const entry of entries) {
+                    const height = entry.contentRect.height;
+                    const isMinimized = height < 60; // Lower threshold to 60px
+
+                    if (isMinimized) {
+                        if (this.currentInsertBtn) this.currentInsertBtn.style.visibility = 'hidden';
+                        if (this.currentCopyBtn) this.currentCopyBtn.style.visibility = 'hidden';
+                    } else {
+                        // Restore visibility -> 'visible' lets 'display' take over
+                        if (this.currentInsertBtn) this.currentInsertBtn.style.visibility = 'visible';
+                        if (this.currentCopyBtn) this.currentCopyBtn.style.visibility = 'visible';
+                    }
+                }
+            });
+            resizeObserver.observe(container);
+
+            // Cleanup observer when editor closes
+            const originalClose = this.closeEditor.bind(this);
+            this.closeEditor = () => {
+                resizeObserver.disconnect();
+                originalClose();
+            };
         }
     }
 }
