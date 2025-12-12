@@ -1,5 +1,7 @@
 # HTEMAIL - Visual HTML Email Builder Extension
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/pepefeliblu/htemail-extension)
+
 **HTEMAIL** is a fully open-source Chrome extension that injects a visual HTML email builder directly into Gmail, Outlook Web, and other major email providers. It empowers users to create responsive, production-ready HTML email templates without leaving their inbox.
 
 ## 🚀 Features
