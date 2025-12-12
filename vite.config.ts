@@ -11,7 +11,7 @@ export default defineConfig({
                 popup: resolve(__dirname, 'popup.html'),
                 editor: resolve(__dirname, 'editor.html'),
                 background: resolve(__dirname, 'src/background/index.ts'),
-                content: resolve(__dirname, 'src/content/index.ts'),
+                // content: built separately via vite.content.config.ts
             },
             output: {
                 entryFileNames: (chunkInfo) => {
@@ -27,22 +27,7 @@ export default defineConfig({
                         if (id.includes('@milkdown') || id.includes('prosemirror')) {
                             return 'vendor-milkdown';
                         }
-                        if (id.includes('tailwindcss') || id.includes('postcss') || id.includes('autoprefixer')) {
-                            return 'vendor-styles';
-                        }
-                        if (id.includes('katex')) {
-                            return 'vendor-katex';
-                        }
-                        if (id.includes('codemirror') || id.includes('@codemirror')) {
-                            return 'vendor-codemirror';
-                        }
-                        if (id.includes('lodash') || id.includes('underscore')) {
-                            return 'vendor-utils';
-                        }
-                        if (id.includes('vue')) { // Just in case
-                            return 'vendor-vue';
-                        }
-                        return 'vendor'; // all other node_modules
+                        return 'vendor';
                     }
                 },
             },
