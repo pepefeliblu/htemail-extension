@@ -9,21 +9,25 @@ const Editor = () => {
     const [crepeInstance, setCrepeInstance] = React.useState<Crepe | null>(null);
 
     useEditor((root) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('sessionId') || 'default';
+        const storageKey = `htemail_draft_${sessionId}`;
+
         const crepe = new Crepe({
             root,
-            defaultValue: localStorage.getItem('htemail_draft') || '# Welcome to HTEMAIL\nStart typing...',
+            defaultValue: sessionStorage.getItem(storageKey) || '# Welcome to HTEMAIL\nStart typing...',
         });
 
         // Configure Listener for Auto-Save and Content Monitoring
         crepe.editor.config((ctx) => {
             ctx.get(listenerCtx).mounted((ctx) => {
-                console.log('HTEMAIL: Editor Mounted');
+                console.log('HTEMAIL: Editor Mounted', sessionId);
                 // Initial check
                 checkContentStatus(crepe);
             });
             ctx.get(listenerCtx).updated((ctx, doc, prevDoc) => {
                 const markdown = crepe.getMarkdown();
-                localStorage.setItem('htemail_draft', markdown);
+                sessionStorage.setItem(storageKey, markdown);
                 checkContentStatus(crepe);
             });
         }).use(listener);

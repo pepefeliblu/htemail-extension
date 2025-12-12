@@ -99,8 +99,12 @@ export class Injector {
         // Append to container (Grammarly style overlay)
         container.appendChild(btn);
 
+        // Generate a unique session ID for this specific compose window
+        const sessionId = Date.now().toString();
+        btn.dataset.sessionId = sessionId;
+
         btn.onclick = () => {
-            this.replaceEditor(target, btn);
+            this.replaceEditor(target, btn, sessionId);
         };
     }
 
@@ -186,8 +190,8 @@ export class Injector {
 
     // We don't need 'currentControls' anymore as we are back to floating buttons.
 
-    private replaceEditor(target: HTMLElement, triggerBtn: HTMLElement) {
-        console.log('HTEMAIL: Replacing editor');
+    private replaceEditor(target: HTMLElement, triggerBtn: HTMLElement, sessionId: string) {
+        console.log('HTEMAIL: Replacing editor', sessionId);
         this.currentTarget = target;
         this.currentTriggerBtn = triggerBtn;
 
@@ -213,10 +217,10 @@ export class Injector {
             position: relative;
         `;
 
-        // 3. Create the Iframe
+        // 3. Create the Iframe with Unique Session ID (Reuse the one from injection)
         const iframe = document.createElement('iframe');
         iframe.id = 'htemail-iframe';
-        iframe.src = chrome.runtime.getURL('editor.html');
+        iframe.src = chrome.runtime.getURL(`editor.html?sessionId=${sessionId}`);
         iframe.style.cssText = `
             width: 100%;
             height: 100%;
