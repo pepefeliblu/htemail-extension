@@ -6,7 +6,7 @@ import { ActionButtons } from './components/ActionButtons';
 import { ComposeOverlay } from './components/ComposeOverlay';
 
 export class Injector {
-    private detector: Detector;
+    private readonly detector: Detector;
 
     // React Roots
     private triggerRoot: Root | null = null;
@@ -112,7 +112,7 @@ export class Injector {
                 onCopy={async () => {
                     // We wrap the promise so the component can await it
                     return new Promise<void>((resolve, reject) => {
-                        // Temporary Hybrid: Fire request. Injector receives text. Injector copies it. 
+                        // Temporary Hybrid: Fire request. Injector receives text. Injector copies it.
                         this.currentIframe?.contentWindow?.postMessage({ type: 'HTEMAIL_EXPORT_REQUEST', action: 'copy' }, '*');
                         // Resolve immediately so button doesn't spin forever waiting for a promise we can't easily resolve here without strict event id matching.
                         resolve();
@@ -210,7 +210,7 @@ export class Injector {
                 onClose={() => this.closeEditor()}
                 onIframeMount={(iframe) => {
                     this.currentIframe = iframe;
-                    // Once iframe is available, we might want to check actions, 
+                    // Once iframe is available, we might want to check actions,
                     // though usually actions wait for user interaction or layout.
                     // But if we need to re-render actions because they depend on iframe presence:
                     this.renderActionButtons();

@@ -1,11 +1,9 @@
 export class Detector {
-    private static GMAIL_COMPOSE_SELECTOR = 'div[role="dialog"] div[role="textbox"][contenteditable="true"], div[role="main"] div[role="textbox"][contenteditable="true"]';
-    private static OUTLOOK_COMPOSE_SELECTOR = 'div[role="textbox"][contenteditable="true"][aria-label*="Message body"]';
+    private static readonly GMAIL_COMPOSE_SELECTOR = 'div[role="dialog"] div[role="textbox"][contenteditable="true"], div[role="main"] div[role="textbox"][contenteditable="true"]';
+    private static readonly OUTLOOK_COMPOSE_SELECTOR = 'div[role="textbox"][contenteditable="true"][aria-label*="Message body"]';
 
     private observer: MutationObserver | null = null;
     private callbacks: Array<(element: HTMLElement) => void> = [];
-
-    constructor() { }
 
     public start(callback: (element: HTMLElement) => void) {
         this.callbacks.push(callback);
