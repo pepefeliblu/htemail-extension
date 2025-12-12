@@ -177,6 +177,16 @@ export class Injector {
             this.currentWrapper = null;
         }
 
+        if (this.currentInsertBtn) {
+            this.currentInsertBtn.remove();
+            this.currentInsertBtn = null;
+        }
+
+        if (this.currentCopyBtn) {
+            this.currentCopyBtn.remove();
+            this.currentCopyBtn = null;
+        }
+
         if (this.currentTarget) {
             this.currentTarget.style.display = 'block';
             this.currentTarget = null;
@@ -365,8 +375,24 @@ export class Injector {
         this.currentInsertBtn = insertBtn;
         this.currentCopyBtn = copyBtn;
 
-        wrapper.appendChild(copyBtn);
-        wrapper.appendChild(insertBtn);
+        // Locate container again to append floating buttons
+        let container = target.closest('div[role="dialog"]');
+        if (!container) {
+            container = target.closest('table[role="presentation"]')?.parentElement || null;
+        }
+
+        if (container) {
+            // Append to container for true floating behavior (z-index 9000)
+            insertBtn.style.zIndex = '9001';
+            copyBtn.style.zIndex = '9001';
+            container.appendChild(copyBtn);
+            container.appendChild(insertBtn);
+        } else {
+            // Fallback if container weirdly missing (unlikely if we are here)
+            wrapper.appendChild(copyBtn);
+            wrapper.appendChild(insertBtn);
+        }
+
         wrapper.appendChild(closeBtn);
         wrapper.appendChild(iframe);
 
